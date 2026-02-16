@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nebula Lite v1.2</title>
+    <title>Nebula Lite v1.3</title>
     <style>
         body { background: #010101; color: #00d4ff; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; margin: 0; }
         .container { max-width: 400px; margin: auto; border: 1px solid #004466; padding: 25px; border-radius: 20px; background: #050505; box-shadow: 0 0 20px rgba(0, 212, 255, 0.1); }
@@ -15,28 +15,29 @@
         button { flex: 1; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; min-width: 100px; }
         .btn-enc { background: #006699; }
         .btn-dec { background: #004466; border: 1px solid #00d4ff; }
-        .btn-reset { background: #660000; border: 1px solid #ff4444; width: 100%; margin-top: 10px; }
+        .btn-reset { background: #440000; border: 1px solid #ff4444; width: 100%; margin-top: 10px; }
         button:hover { opacity: 0.8; transform: scale(0.98); }
         #result-box { margin-top: 25px; padding: 15px; border-top: 1px solid #222; }
         .label-hasil { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-        #result { font-size: 22px; color: #00ff88; font-family: 'Courier New', monospace; word-break: break-all; margin-top: 10px; min-height: 30px; }
+        #result { font-size: 20px; color: #00ff88; font-family: 'Courier New', monospace; word-break: break-all; margin-top: 10px; min-height: 30px; }
+        .warning { color: #ff4444 !important; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <h2>NEBULA LITE</h2>
-        <div class="version">V1.2 - SECURE PROTOCOL ACTIVE</div>
+        <div class="version">V1.3 - SECURITY PROTOCOL ACTIVE</div>
         
         <input type="text" id="inputString" placeholder="Pesan" autocomplete="off" spellcheck="false">
         <input type="text" id="key" placeholder="Master Key" autocomplete="off" spellcheck="false">
         <input type="number" id="shift" placeholder="Shift (S)" autocomplete="off">
         
         <div class="btn-group">
-    <button class="btn-enc" onclick="process(true)">ENKRIPSI</button>
-    <button class="btn-dec" onclick="process(false)">DEKRIPSI</button>
-    <button class="btn-reset" onclick="selfDestruct()">RESET</button>
-</div>
+            <button class="btn-enc" onclick="process(true)">ENKRIPSI</button>
+            <button class="btn-dec" onclick="process(false)">DEKRIPSI</button>
+            <button class="btn-reset" onclick="selfDestruct()">RESET</button>
+        </div>
 
         <div id="result-box">
             <div class="label-hasil" id="status-label">SIAGA</div>
@@ -46,16 +47,39 @@
 
     <script>
         function process(isEncrypt) {
-            let input = document.getElementById('inputString').value.toUpperCase();
-            let keyStr = document.getElementById('key').value;
-            let s = parseInt(document.getElementById('shift').value) || 0;
-            let k = keyStr.length;
+            let input = document.getElementById('inputString').value.trim().toUpperCase();
+            let keyStr = document.getElementById('key').value.trim();
+            let sInput = document.getElementById('shift').value;
+            let s = parseInt(sInput);
+            
+            let resultDiv = document.getElementById('result');
+            let label = document.getElementById('status-label');
 
-            if (k < 6) {
-                alert("Master Key minimal 6 karakter!");
+            // 1. Validasi Input Pesan
+            if (input === "") {
+                showWarning("PESAN KOSONG!");
                 return;
             }
 
+            // 2. Validasi Master Key (Min 6 karakter)
+            if (keyStr.length < 6) {
+                showWarning("KEY MINIMAL 6 HURUF!");
+                return;
+            }
+
+            // 3. Validasi Shift (Harus diisi)
+            if (sInput === "" || isNaN(s)) {
+                showWarning("SHIFT HARUS DIISI!");
+                return;
+            }
+
+            // 4. Protokol Distress Key (Kunci Darurat)
+            if (keyStr.toUpperCase() === "NEBULA123") {
+                showWarning("AKSES DITOLAK");
+                return;
+            }
+
+            let k = keyStr.length;
             let output = "";
             let n = 1;
 
@@ -80,19 +104,27 @@
                 }
                 n++;
             }
-            document.getElementById('status-label').innerText = isEncrypt ? "HASIL ENKRIPSI:" : "HASIL DEKRIPSI:";
-            document.getElementById('result').innerText = output;
+
+            label.innerText = isEncrypt ? "HASIL ENKRIPSI:" : "HASIL DEKRIPSI:";
+            resultDiv.innerText = output;
+            resultDiv.classList.remove('warning');
+        }
+
+        function showWarning(msg) {
+            let resultDiv = document.getElementById('result');
+            document.getElementById('status-label').innerText = "PERINGATAN SISTEM:";
+            resultDiv.innerText = msg;
+            resultDiv.classList.add('warning');
         }
 
         function selfDestruct() {
-            // Menghapus semua input dan hasil seketika
             document.getElementById('inputString').value = "";
             document.getElementById('key').value = "";
             document.getElementById('shift').value = "";
             document.getElementById('result').innerText = "...";
-            document.getElementById('status-label').innerText = "DATA TERHAPUS";
+            document.getElementById('result').classList.remove('warning');
+            document.getElementById('status-label').innerText = "SIAGA";
             
-            // Memberikan feedback visual singkat
             let container = document.querySelector('.container');
             container.style.borderColor = "#ff4444";
             setTimeout(() => { container.style.borderColor = "#004466"; }, 500);
