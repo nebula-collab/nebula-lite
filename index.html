@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nebula Lite - Level 1</title>
+    <style>
+        /* Desain Khas Klan Nebula */
+        body { 
+            background: #010101; 
+            color: #00d4ff; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            text-align: center; 
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            border: 1px solid #004466;
+            padding: 30px;
+            border-radius: 20px;
+            background: #050505;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+        }
+        h2 { letter-spacing: 3px; font-weight: 300; }
+        .tagline { font-size: 10px; color: #555; margin-bottom: 20px; }
+        
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: #111; 
+            border: 1px solid #222; 
+            color: #fff; 
+            border-radius: 8px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        
+        button { 
+            width: 100%;
+            background: #006699; 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        button:hover { background: #0088cc; }
+
+        #result-box {
+            margin-top: 25px;
+            padding: 15px;
+            border-top: 1px solid #222;
+        }
+        .label-hasil { font-size: 12px; color: #555; }
+        #result { 
+            font-size: 28px; 
+            color: #00ff88; 
+            font-family: 'Courier New', Courier, monospace;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>NEBULA LITE</h2>
+        <div class="tagline">SMART LIFESTYLE & SECURITY LITERACY</div>
+        
+        <input type="text" id="plaintext" placeholder="Pesan (Plaintext)" autocomplete="off">
+        <input type="text" id="key" placeholder="Master Key (Min 6 Karakter)" autocomplete="off">
+        <input type="number" id="shift" placeholder="Shift Spesial (S)" autocomplete="off">
+        
+        <button onclick="calculate()">VALIDASI NALAR</button>
+
+        <div id="result-box">
+            <div class="label-hasil">LOGIKA TERVERIFIKASI:</div>
+            <div id="result">...</div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            let text = document.getElementById('plaintext').value.toUpperCase();
+            let keyStr = document.getElementById('key').value;
+            let s = parseInt(document.getElementById('shift').value) || 0;
+            
+            // Batas minimal 6 karakter sesuai aturan klan
+            if (keyStr.length < 6 && keyStr.length > 0) {
+                alert("Master Key minimal 6 karakter untuk keamanan.");
+                return;
+            }
+
+            let k = keyStr.length;
+            let output = "";
+            let n = 1;
+
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let code = char.charCodeAt(0);
+
+                if (code >= 65 && code <= 90) { // Hanya A-Z
+                    let p = code - 64;
+                    // Rumus Utama: (P + K + n) + S
+                    let raw = (p + k + n + s) % 26;
+                    if (raw === 0) raw = 26;
+                    output += String.fromCharCode(raw + 64);
+                } else {
+                    // Karakter non-alfabet tetap tampil
+                    output += char;
+                }
+                n++; // Posisi n tetap bertambah
+            }
+            document.getElementById('result').innerText = output;
+        }
+    </script>
+</body>
+</html>
